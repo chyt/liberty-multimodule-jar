@@ -77,6 +77,7 @@
 							<version>${version.openliberty-runtime}</version>
 							<type>zip</type>
 						</assemblyArtifact>
+						<installAppPackages>dependencies</installAppPackages>
 						<serverName>${liberty.server.name}</serverName>
 						<configFile>src/main/liberty/config/server.xml</configFile>
 						<packageFile>${liberty.package.file}</packageFile>
@@ -90,14 +91,62 @@
 						</bootstrapProperties>
 					</configuration>
 					<executions>
-						<execution>
-							<id>create-server</id>
-							<phase>prepare-package</phase>
-							<goals>
-								<goal>install-server</goal>
-								<goal>create-server</goal>
-							</goals>
-						</execution>
+                        <execution>
+                            <id>stop-server-before-clean</id>
+                            <phase>pre-clean</phase>
+                            <goals>
+                                <goal>stop-server</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>create-server</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>install-server</goal>
+                                <goal>create-server</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>install-feature</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                              <goal>install-feature</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>target/liberty-alt-output-dir</outputDirectory>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>install-apps</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>install-apps</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>package-server</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>package-server</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>target/liberty-alt-output-dir</outputDirectory>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>test-start-server</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>test-start-server</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>test-stop-server</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>test-stop-server</goal>
+                            </goals>
+                        </execution>
 					</executions>
 				</plugin>
 			</plugins>
